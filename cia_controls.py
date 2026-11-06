@@ -1,5 +1,6 @@
 import hashlib
 import hmac
+import time
 from collections import defaultdict
 from cryptography.fernet import Fernet
 
@@ -9,7 +10,7 @@ _RATE_LIMITS = defaultdict(int)
 RATE_LIMIT_WINDOW = 5 #Seconds
 MAX_REQUESTS = 3 #Max request allowed within window
 
-#----confidentality functions --------
+#----Confidentality functions --------
 
 def generate_enryption_key() ->bytes:
     """ generates the symmetric ket for AES encryption"""
@@ -39,5 +40,24 @@ def verify_integrity(data:str, provided_signature:str, secret_key:bytes) ->bool:
     expected_signature = sign_payload(data, secret_key)
     return hmac.compare_digest(expected_signature, provided_signature)
 
+#---------------------Availiability functions---------------------------
+
+def check_rate_limit(client_ip:str) -> bool:
+    """
+    Availability control: sliding window rate limiter to guard
+    against Denial of Service (DoS) and brute-force flooding.
+    """
+    now = time.time()
+
+    _RATE_LIMITS[client_ip] = [
+        ts for ts in _RATE_LIMITS[client_ip]
+        if now - ts < RATE_LIMIT_WINDOW
+    ]
+
+    if len(_RATE_LIMITS[client_ip]) > MAX_REQUESTS:
+        return False
+
+    _RATE_LIMITS[client_ip].append(now)
+    return True
 
 
