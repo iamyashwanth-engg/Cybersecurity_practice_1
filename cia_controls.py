@@ -6,7 +6,7 @@ from cryptography.fernet import Fernet
 
 #Rate limiter state: tracks request timestamps per ip
 
-_RATE_LIMITS = defaultdict(int)
+_RATE_LIMITS = defaultdict(list)
 RATE_LIMIT_WINDOW = 5 #Seconds
 MAX_REQUESTS = 3 #Max request allowed within window
 
@@ -54,7 +54,7 @@ def check_rate_limit(client_ip:str) -> bool:
         if now - ts < RATE_LIMIT_WINDOW
     ]
 
-    if len(_RATE_LIMITS[client_ip]) > MAX_REQUESTS:
+    if len(_RATE_LIMITS[client_ip]) >= MAX_REQUESTS:
         return False
 
     _RATE_LIMITS[client_ip].append(now)
