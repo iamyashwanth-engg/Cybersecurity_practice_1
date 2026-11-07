@@ -1,6 +1,6 @@
 import logging
 
-from aiohttp import payload_type
+
 
 # set up the detective audit logger
 
