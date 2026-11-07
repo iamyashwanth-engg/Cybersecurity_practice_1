@@ -12,7 +12,7 @@ MAX_REQUESTS = 3 #Max request allowed within window
 
 #----Confidentality functions --------
 
-def generate_enryption_key() ->bytes:
+def generate_encryption_key() ->bytes:
     """ generates the symmetric ket for AES encryption"""
     key = Fernet.generate_key()
     return key
